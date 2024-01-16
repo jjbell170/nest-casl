@@ -70,6 +70,14 @@ describe('AccessService', () => {
         { action: 'manage', subject: Post },
       ]);
     });
+
+    it('returns user abilities for string type subjects', async () => {
+      expect(accessService.getAbility(user).can(Actions.read, 'Post')).toBeTruthy();
+    });
+
+    it('returns false for user abilities for string type subjects that are not allowed', async () => {
+      expect(accessService.getAbility(user).can(Actions.delete, 'Post')).toBeFalsy();
+    });
   });
 
   describe('hasAbility()', () => {
@@ -84,6 +92,10 @@ describe('AccessService', () => {
     it('denies access to delete action for customer', async () => {
       user = { id: 'userId', roles: [Roles.customer] };
       expect(accessService.hasAbility(user, Actions.delete, Post)).toBeFalsy();
+    });
+
+    it('allows access to delete action for string type subject for operator', async () => {
+      expect(accessService.hasAbility(user, Actions.delete, 'Post')).toBeTruthy();
     });
 
     it('allows access to update not restricted field for customer', async () => {
