@@ -29,7 +29,7 @@ export class UserAbilityBuilder<
 }
 
 export type DefinePermissions<
-  Subjects extends Subject | string = Subject | string,
+  Subjects extends Subject | 'Post' | 'Comment' | string = Subject | 'Post' | 'Comment' | string,
   Actions extends string = DefaultActions,
   User extends AuthorizableUser<unknown, unknown> = AuthorizableUser,
 > = (builder: UserAbilityBuilder<Subjects, Actions, User>) => void;
