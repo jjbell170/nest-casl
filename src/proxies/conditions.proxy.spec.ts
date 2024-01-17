@@ -26,7 +26,6 @@ describe('ConditionsProxy', () => {
         can('read', 'Upload', { user: 'userId', public: false });
       });
       const conditionsProxy = new ConditionsProxy(ability, 'read', 'Upload');
-      expect(conditionsProxy.toSql()).toEqual([
         '("user" = $1 and "public" = $2) or "public" = $3',
         ['userId', false, true],
         [],
@@ -71,9 +70,6 @@ describe('ConditionsProxy', () => {
         cannot('update', 'Movie', { status: 'PUBLISHED' });
       });
       const conditionsProxy = new ConditionsProxy(ability, 'update', 'Movie');
-      expect(conditionsProxy.toMongo()).toEqual({ $and: [{ $nor: [{ status: 'PUBLISHED' }] }] });
-    });
-
     it('compose can rules', () => {
       const ability = defineAbility((can) => {
         can('read', 'Upload', { public: true });

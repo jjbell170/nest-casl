@@ -29,14 +29,14 @@ export class UserAbilityBuilder<
 }
 
 export type DefinePermissions<
-  Subjects extends Subject = Subject,
+  Subjects extends Subject | 'Post' | 'Comment' | string = Subject | 'Post' | 'Comment' | string,
   Actions extends string = DefaultActions,
   User extends AuthorizableUser<unknown, unknown> = AuthorizableUser,
 > = (builder: UserAbilityBuilder<Subjects, Actions, User>) => void;
 
 export type Permissions<
   Roles extends string,
-  Subjects extends Subject = Subject,
+  Subjects extends Subject | string = Subject | string,
   Actions extends string = DefaultActions,
   User extends AuthorizableUser<unknown, unknown> = AuthorizableUser<Roles>,
 > = Partial<Record<Roles | 'every' | 'everyone', DefinePermissions<Subjects, Actions, User>>>;
