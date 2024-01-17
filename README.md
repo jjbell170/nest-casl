@@ -85,11 +85,11 @@ import { Roles } from '../app.roles';
 import { Post } from './dtos/post.dto';
 import { Comment } from './dtos/comment.dto';
 
-export type Subjects = InferSubjects<typeof Post, typeof Comment> | string;
+export type Subjects = InferSubjects<typeof Post, typeof Comment> | 'Post' | 'Comment';
 
 export const permissions: Permissions<Roles, Subjects, Actions> = {
   everyone({ can }) {
-    can(Actions.read, 'Post'); // Subjects can now be specified as string literals in addition to class types
+    can(Actions.read, 'Post'); // Subjects can now be specified as string literals
     can(Actions.create, 'Post'); // This flexibility allows for defining permissions without a corresponding DTO
   },
 
