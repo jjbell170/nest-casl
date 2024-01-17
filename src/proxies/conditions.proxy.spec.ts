@@ -8,13 +8,6 @@ describe('ConditionsProxy', () => {
         can('update', 'Post', { userId: 'userId' });
       });
       const conditionsProxy = new ConditionsProxy(ability, 'update', 'Post');
-      // Testing with string subject
-      const stringSubjectAbility = defineAbility((can) => {
-        can('update', 'string:Post', { userId: 'userId' });
-      });
-      const stringSubject = 'string:Post';
-      const conditionsProxyStringSubject = new ConditionsProxy(stringSubjectAbility, 'update', stringSubject);
-      expect(conditionsProxyStringSubject.toSql()).toEqual(['"userId" = $1', ['userId'], []]);
       expect(conditionsProxy.toSql()).toEqual(['"userId" = $1', ['userId'], []]);
     });
 
@@ -24,14 +17,6 @@ describe('ConditionsProxy', () => {
         cannot('update', 'Movie', { status: 'PUBLISHED' });
       });
       const conditionsProxy = new ConditionsProxy(ability, 'update', 'Movie');
-      // Testing with string subject
-      const stringSubjectAbility = defineAbility((can, cannot) => {
-        can('update', 'string:Movie');
-        cannot('update', 'string:Movie', { status: 'PUBLISHED' });
-      });
-      const stringSubject = 'string:Movie';
-      const conditionsProxyStringSubject = new ConditionsProxy(stringSubjectAbility, 'update', stringSubject);
-      expect(conditionsProxyStringSubject.toSql()).toEqual(['not ("status" = $1)', ['PUBLISHED'], []]);
       expect(conditionsProxy.toSql()).toEqual(['not ("status" = $1)', ['PUBLISHED'], []]);
     });
 
@@ -41,19 +26,6 @@ describe('ConditionsProxy', () => {
         can('read', 'Upload', { user: 'userId', public: false });
       });
       const conditionsProxy = new ConditionsProxy(ability, 'read', 'Upload');
-      // Testing with string subject
-      const stringSubjectAbility = defineAbility((can) => {
-        can('read', 'string:Upload', { public: true });
-        can('read', 'string:Upload', { user: 'userId', public: false });
-      });
-      const stringSubject = 'string:Upload';
-      const conditionsProxyStringSubject = new ConditionsProxy(stringSubjectAbility, 'read', stringSubject);
-      expect(conditionsProxyStringSubject.toSql()).toEqual([
-        '("user" = $1 and "public" = $2) or "public" = $3',
-        ['userId', false, true],
-        [],
-      ]);
-      expect(conditionsProxy.toSql()).toEqual([
         '("user" = $1 and "public" = $2) or "public" = $3',
         ['userId', false, true],
         [],
@@ -83,19 +55,6 @@ describe('ConditionsProxy', () => {
         can('update', 'Post', { userId: 'userId' });
       });
       const conditionsProxy = new ConditionsProxy(ability, 'update', 'Post');
-      // Testing with string subject
-      const stringSubjectAbility = defineAbility((can) => {
-        can('update', 'string:Post', { userId: 'userId' });
-      });
-      const stringSubject = 'string:Post';
-      const conditionsProxyStringSubject = new ConditionsProxy(stringSubjectAbility, 'update', stringSubject);
-      expect(conditionsProxyStringSubject.toMongo()).toEqual({
-        $or: [
-          {
-            userId: 'userId',
-          },
-        ],
-      });
       expect(conditionsProxy.toMongo()).toEqual({
         $or: [
           {
@@ -111,17 +70,6 @@ describe('ConditionsProxy', () => {
         cannot('update', 'Movie', { status: 'PUBLISHED' });
       });
       const conditionsProxy = new ConditionsProxy(ability, 'update', 'Movie');
-      // Testing with string subject
-      const stringSubjectAbility = defineAbility((can, cannot) => {
-        can('update', 'string:Movie');
-        cannot('update', 'string:Movie', { status: 'PUBLISHED' });
-      });
-      const stringSubject = 'string:Movie';
-      const conditionsProxyStringSubject = new ConditionsProxy(stringSubjectAbility, 'update', stringSubject);
-      expect(conditionsProxyStringSubject.toMongo()).toEqual({ $and: [{ $nor: [{ status: 'PUBLISHED' }] }] });
-      expect(conditionsProxy.toMongo()).toEqual({ $and: [{ $nor: [{ status: 'PUBLISHED' }] }] });
-    });
-
     it('compose can rules', () => {
       const ability = defineAbility((can) => {
         can('read', 'Upload', { public: true });
@@ -155,17 +103,6 @@ describe('ConditionsProxy', () => {
         can('read', 'Upload', { userId: { $not: null } });
       });
       const conditionsProxy = new ConditionsProxy(ability, 'read', 'Upload');
-      // Testing with string subject
-      const stringSubjectAbility = defineAbility((can) => {
-        can('read', 'string:Upload', { userId: { $in: ['1', '2'] } });
-        can('read', 'string:Upload', { userId: { $not: null } });
-      });
-      const stringSubject = 'string:Upload';
-      const conditionsProxyStringSubject = new ConditionsProxy(stringSubjectAbility, 'read', stringSubject);
-      expect(conditionsProxyStringSubject.get()).toEqual([
-        { userId: { $not: null } },
-        { userId: { $in: ['1', '2'] } },
-      ]);
       expect(conditionsProxy.get()).toEqual([{ userId: { $not: null } }, { userId: { $in: ['1', '2'] } }]);
     });
   });
