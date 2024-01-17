@@ -46,7 +46,7 @@ export class AccessService {
     }
 
     // Handle string subjects by converting to appropriate format
-    return typeof subject === 'string' ? userAbilities.can(action, subject, field) : userAbilities.can(action, subject, field);
+    return userAbilities.can(action, subject, field);
   }
 
   public assertAbility<User extends AuthorizableUser<string, unknown> = AuthorizableUser>(
@@ -57,7 +57,7 @@ export class AccessService {
   ): void {
     if (!this.hasAbility(user, action, subject, field)) {
       const userAbilities = this.abilityFactory.createForUser(user, Ability);
-      const relatedRules = userAbilities.rulesFor(action, typeof subject === 'string' ? subject : typeof subject === 'object' ? subject.constructor : subject);
+      const relatedRules = userAbilities.rulesFor(action, subject);
       if (relatedRules.some((rule) => rule.conditions)) {
         throw new NotFoundException();
       }
@@ -93,7 +93,7 @@ export class AccessService {
     }
 
     // Correctly initialize user abilities when subject might be a string
-    let userAbilities = typeof ability.subject === 'string' ? this.abilityFactory.createForUser(user) : this.abilityFactory.createForUser(user, Ability);
+    let userAbilities = this.abilityFactory.createForUser(user);
     const relevantRules = userAbilities.rulesFor(ability.action, ability.subject);
 
     req.setConditions(new ConditionsProxy(userAbilities, ability.action, ability.subject));
@@ -101,7 +101,7 @@ export class AccessService {
     // If no relevant rules with conditions or no subject hook exists check against subject class
     if (!relevantRules.every((rule) => rule.conditions) || !ability.subjectHook) {
       // Ensure can handle string subjects appropriately
-    return typeof ability.subject === 'string' ? userAbilities.can(ability.action, ability.subject) : userAbilities.can(ability.action, ability.subject);
+    return userAbilities.can(ability.action, ability.subject);
     }
 
     // Otherwise try to obtain subject
@@ -119,7 +119,7 @@ export class AccessService {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // Construct the actual subject, considering the possibility of a string subject
-    const actualSubject = typeof ability.subject === 'string' ? ability.subject : subject(ability.subject as any, subjectInstance);
+    const actualSubject = ability.subject;
 
     const cannotActivateSomeField = this.isThereAnyFieldRestriction(
       request.body,
